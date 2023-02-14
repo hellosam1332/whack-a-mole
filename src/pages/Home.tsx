@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import styled from '@emotion/styled';
 import PageLayout from '../components/PageLayout';
 import GameStartForm from '../components/form/GameStartForm';
 
@@ -18,6 +19,10 @@ function Home() {
     navigate(`/game/${column}/${rowSize}/${numberOfMoles}`);
   };
 
+  const moveToRankingPage = () => {
+    navigate('/ranking');
+  };
+
   return (
     <PageLayout title="준비화면">
       <section>
@@ -29,9 +34,17 @@ function Home() {
           }}
           onSubmit={submitForm}
         />
+        <RankingButton type="button" onClick={moveToRankingPage}>
+          순위보기
+        </RankingButton>
       </section>
     </PageLayout>
   );
 }
+
+const RankingButton = styled.button`
+  margin-top: 20px;
+  width: 100px;
+`;
 
 export default Home;
