@@ -7,7 +7,7 @@ import {
   useReducer,
   useRef,
 } from 'react';
-import { MOLE_ANIMATION_DURATION_MS } from '../../config';
+import { INITIAL_DIFFICULY, MOLE_ANIMATION_DURATION_MS } from '../../config';
 
 export type GameStaus = 'idle' | 'running' | 'paused' | 'done';
 
@@ -136,19 +136,21 @@ function GameProvider({
   };
 
   const timeoutRef = useRef<number>();
+  const difficultyRef = useRef<number>(INITIAL_DIFFICULY);
 
   useEffect(() => {
-    const shuffle = (time: number) => {
-      return window.setTimeout(async () => {
-        if (state.status !== 'running') {
-          return;
-        }
-        await activateRandomMolesWithDuration();
-        timeoutRef.current = shuffle(Math.max(500, time - 100)); // TODO implement difficulty
-      }, time);
+    const shuffle = async () => {
+      await activateRandomMolesWithDuration();
+      timeoutRef.current = window.setTimeout(async () => {
+        difficultyRef.current -= 100;
+        shuffle();
+      }, Math.max(500, difficultyRef.current));
     };
 
-    timeoutRef.current = shuffle(2000);
+    if (state.status === 'running') {
+      shuffle();
+    }
+
     return () => window.clearInterval(timeoutRef.current);
   }, [dispatch, state.status]);
 
