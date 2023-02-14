@@ -83,5 +83,5 @@ const Moles = styled.div<{ col: number; row: number }>`
   grid-gap: 20px;
   grid-template-columns: repeat(${({ col }) => col}, 1fr);
   grid-template-rows: repeat(${({ row }) => row}, 1fr);
-  aspect-ratio: 1;
+  aspect-ratio: ${({ col, row }) => col / row};
 `;

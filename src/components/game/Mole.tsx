@@ -17,6 +17,7 @@ function Mole({ active, whacked, onWhack }: Props) {
 
   return (
     <Container>
+      <Bush />
       <Button
         data-testid="mole-button"
         type="button"
@@ -30,10 +31,20 @@ function Mole({ active, whacked, onWhack }: Props) {
 
 const Container = styled.div`
   position: relative;
-  background-color: red;
   overflow: hidden;
   display: grid;
   place-items: center;
+`;
+
+const Bush = styled.div`
+  position: absolute;
+  bottom: -15%;
+  background: url('/bush.png') no-repeat;
+  background-size: contain;
+  background-position-y: bottom;
+  z-index: 2;
+  width: 100%;
+  aspect-ratio: 363/147;
 `;
 
 const Button = styled.button<{
@@ -42,10 +53,13 @@ const Button = styled.button<{
 }>`
   position: absolute;
   width: 50%;
-  height: 70%;
   bottom: ${({ visible }) => (visible ? '0' : '-70%')};
   z-index: 1;
   transition: ease-in ${({ transitionDuration: duration }) => `${duration}ms`};
+
+  background: url('/teemo.png') no-repeat;
+  background-size: contain;
+  aspect-ratio: 598/885;
 `;
 
 export default Mole;
