@@ -33,3 +33,61 @@
 ```bash
     $ yarn build
 ```
+
+# 프로젝트 구성
+## Router
+ 브라우저 history api 를 별도로 관리하지 않아도 되는 `HashRouter` 를 사용합니다.
+
+### Url query paramerters
+페이지 이동시 열, 행, 두더시 수를 url query parameter 를 가져 이동 시 입력된 값을 유지할 수 있고, url 로 사용자 입력 상태를 관리하여 url 공유 및 재사용시 장점이 있습니다.
+
+## 두더지 게임
+게임 플레이에 필요한 상태는 global state 대신 코드의 간결함과 다른 페이지와 의존성을 분리하기 위해 페이지 내 context api 및 useReducer 훅으로 구현하였습니다.
+### Core logic
+useEffect 훅 안에서 setTimeout 을 재귀적으로 호출하여 interval 을 구현 하였습니다. 그 이유는 게임 진행에 따라 증가하는 난이도를 구현을 간단하게 처리하기 위해서 입니다.
+
+```Typescript
+  const timeoutRef = useRef<number>();
+  const difficultyRef = useRef<number>(INITIAL_DIFFICULY);
+
+  useEffect(() => {
+    const shuffle = async () => {
+      await activateRandomMolesWithDuration();
+      timeoutRef.current = window.setTimeout(async () => {
+        difficultyRef.current -= 100;
+        shuffle();
+      }, Math.max(500, difficultyRef.current));
+    };
+
+    if (state.status === 'running') {
+      shuffle();
+    }
+
+    return () => window.clearInterval(timeoutRef.current);
+  }, [dispatch, state.status]);
+```
+
+## 순위 레코드 영속성
+게임 순위 레코드의 영속성을 구현하기 위해 localStorage 와 관련한 로직을 react component 에서 재사용 가능하도록 `useLocalStoreage` hook 을 구현하였습니다.
+
+## Grid and Responsive UI
+반응형 두더지 화면 구현을 위해 행과 열을 동적으로 설정하기 쉬운 Grid 를 사용하고 `aspect-ratio` 속성과 `%` 단위를 이용하여 반응형 UI 를 구현하였습니다.
+
+## Tests
+`React-testing-library` 를 사용하여 react component 의 렌더링 되는 요소와 사용자 인터랙션을 검증합니다.
+
+```bash
+ ✓ src/components/ResultSection.test.tsx (1)
+ ✓ src/components/RankingSection.test.tsx (4)
+ ✓ src/components/game/GameController.test.tsx (3)
+ ✓ src/components/form/GameStartForm.test.tsx (1)
+ ✓ src/App.test.tsx (4)
+ ✓ src/utils/GameStartUtils.test.ts (4)
+ ✓ src/components/game/GamePanel.test.tsx (1)
+ ✓ src/components/game/Mole.test.tsx (2)
+
+ Test Files  8 passed (8)
+      Tests  20 passed (20)
+   Start at  20:35:18
+   Duration  1.38s (transform 90ms, setup 673ms, collect 1.21s, tests 515ms)
+```
